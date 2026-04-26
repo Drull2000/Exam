@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace ForbiddenWordsScanner
-{
+{// главная форма
     public partial class Form1 : Form
     {
         public Form1()
@@ -20,7 +20,7 @@ namespace ForbiddenWordsScanner
         object lockObj = new();
 
         Dictionary<string, int> wordStats = new();
-
+        // кнопка старта
         private async void knopkaStart_Click(object sender, EventArgs e)
         {
             cts = new CancellationTokenSource();
@@ -41,13 +41,13 @@ namespace ForbiddenWordsScanner
 
             lblStatus.Text = "Работаем Братья!...";
 
-            
+            // очистка логов и статистики перед стартом
             listBoxLog.Items.Clear();
             wordStats.Clear();
             processedFiles = 0;
             currentFiles = 0;
 
-            
+            // подсчет всех файлов для прогресс бара
             totalFiles = File.Exists(path)
                 ? 1
                 : CountFiles(path, cts.Token);
@@ -55,7 +55,7 @@ namespace ForbiddenWordsScanner
             progressBar1.Minimum = 0;
             progressBar1.Maximum = totalFiles;
             progressBar1.Value = 0;
-
+           
             await Task.Run(() =>
             {
                 if (File.Exists(path))
@@ -67,16 +67,16 @@ namespace ForbiddenWordsScanner
                     ScanDirectory(path, words, outputFolder, cts.Token);
                 }
             });
-
+            
             GenerateReport(outputFolder);
-
+            // обновление статуса и логов после завершения
             this.Invoke((Delegate)(() =>
             {
                 lblStatus.Text = "Готово!";
                 listBoxLog.Items.Add("✔ Завершено");
             }));
         }
-
+        // кнопка паузы и возобновления
         private void knopkaPaysa_Click(object sender, EventArgs e)
         {
             if (pauseEvent.IsSet)
@@ -90,13 +90,13 @@ namespace ForbiddenWordsScanner
                 lblStatus.Text = "Работаем!";
             }
         }
-
+        // кнопка чтобы остановить братву
         private void knopkaOstan_Click(object sender, EventArgs e)
         {
             cts.Cancel();
             lblStatus.Text = "Остановлено!";
         }
-
+        // подсчет всех файлов для прогресс бара
         int CountFiles(string path, CancellationToken token)
         {
             int count = 0;
@@ -118,7 +118,7 @@ namespace ForbiddenWordsScanner
 
             return count;
         }
-
+        // обход всех папок, который чел изначально написал в txtbox
         void ScanDirectory(string path, string[] words, string output, CancellationToken token)
         {
             if (token.IsCancellationRequested) return;
@@ -139,7 +139,7 @@ namespace ForbiddenWordsScanner
             }
             catch { }
         }
-
+        // обработка каждого файла
         void ProcessFile(string file, string[] words, string output)
         {
             try
@@ -157,7 +157,7 @@ namespace ForbiddenWordsScanner
                         found = true;
 
                         int count = Regex.Matches(text, word, RegexOptions.IgnoreCase).Count;
-
+                        // замена слов на звезды фраерские
                         text = Regex.Replace(text, word, "*******", RegexOptions.IgnoreCase);
 
                         lock (lockObj)
@@ -197,7 +197,7 @@ namespace ForbiddenWordsScanner
             }
             catch { }
         }
-
+        // генерация отчета
         void GenerateReport(string output)
         {
             string reportPath = Path.Combine(output, "report.txt");
@@ -207,7 +207,7 @@ namespace ForbiddenWordsScanner
                 .Take(10);
 
             List<string> lines = new();
-
+            // добавляем статистику по каждому слову
             lines.Add("ТОП слова:");
 
             foreach (var w in topWords)
@@ -222,7 +222,7 @@ namespace ForbiddenWordsScanner
                 listBoxLog.Items.Add("📄 Отчёт создан. Его можно найти в C:Resultati");
             }));
         }
-
+        // браузер папок и фалов
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
@@ -241,17 +241,17 @@ namespace ForbiddenWordsScanner
                 }
             }
         }
-
+        // лог выбора файла или папки
         private void listBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            // инициал при форме 
         }
 
-
+        // спасибо за внимание, Володимир! Где то что то подсмотрел, говорю сразу, но как и обещал, я все нейронкой не пишу, есть своя логика в бащке. Хороших вам выходных, и спасибо за то что читаете это!
 
 
     }
